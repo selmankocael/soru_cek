@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soru Çek</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div>
+            <label for="class">Sınıf Seç: </label>
+            <select v-model="sinif" name="class" v-on:change='DersSec()'>
+                <option v-for="sinif1 in siniflar" v-bind:value='sinif1.sinif_id'>{{sinif1.sinif_adi}}</option>
+            </select>
+        </div>
+        <br>
+        <div>
+            <label for="lesson">Ders Seç: </label>
+            <select v-model="ders" name="lesson" v-on:change='KitapSec()'>
+                <option v-for="ders in dersler" v-bind:value='ders.Id'>{{ders.LessonName}}</option>
+            </select>
+        </div>
+        <h2>Seçilen sınıf: {{sinif}} </h2>
+        <h2>Seçilen sınıf: {{ders}}</h2>
+        <div>
+            <h2>Kitap seç</h2>
+
+            <p v-for="kitap in kitaplar">
+                <a @click="TestGetir(kitap.Id)">
+                    <img v-bind:src="'https://apps.workwin.net' + kitap.PublicCoverImageUrl"> <br>
+                    {{kitap.Name}} <br>
+                    <button @click="TestGetir(kitap.Id)">{{kitap.Id}}</button>
+                </a>
+            </p>
+
+        </div>
+        <div>
+            <p v-for="test in testler">
+                {{test.text}}
+            <p v-for="test1 in test.children">
+                {{test1.text}}
+            </p>
+
+            </p>
+        </div>
+    </div>
+    <script>
+
+
+        const app = new Vue({
+            el: '#app',
+            data: {
+                sinif: '',
+                ders: '',
+                kitap: '',
+                // test: '',
+                siniflar: [
+                    { sinif_adi: '5. sınıf', sinif_id: 7 },
+                    { sinif_adi: '6. sınıf', sinif_id: 8 },
+                    { sinif_adi: '7. sınıf', sinif_id: 9 },
+                    { sinif_adi: '8. sınıf', sinif_id: 10 },
+                    { sinif_adi: '9. sınıf', sinif_id: 11 },
+                    { sinif_adi: '10. sınıf', sinif_id: 12 },
+                    { sinif_adi: '11. sınıf', sinif_id: 13 },
+                    { sinif_adi: 'TYT-AYT', sinif_id: 14 }
+                ],
+                dersler: '',
+                kitaplar: '',
+                testler: '',
+
+            },
+            // created() {
+
+
+            // },
+            methods: {
+                DersSec() {
+                    fetch('https://apps.workwin.net/SolutionApp/SolutionAppPublic/GetLessons?classId=' + this.sinif)
+                        .then(response => response.json())
+                        .then(json => {
+                            this.dersler = json
+                        })
+                },
+                KitapSec() {
+                    fetch('https://apps.workwin.net/SolutionApp/SolutionAppPublic/GetBooks?classId=' + this.sinif + '&lessonId=' + this.ders)
+                        .then(response => response.json())
+                        .then(json => {
+                            this.kitaplar = json
+                        })
+                },
+                TestGetir(kitap_Id) {
+                    this.kitap = kitap_Id;
+                    fetch('https://apps.workwin.net/SolutionApp/SolutionAppPublic/GetBookContentTreeView?id=' + kitap_Id)
+                        .then(response => response.json())
+                        .then(json => {
+                            this.testler = json
+                        })
+                }
+
+            }
+        })
+    </script>
+</body>
+
+</html>
